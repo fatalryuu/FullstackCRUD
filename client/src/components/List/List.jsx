@@ -8,7 +8,6 @@ const List = () => {
     const { list } = useContext(ListContext);
     const [isVisible, setIsVisible] = useState(false);
     const [values, setValues] = useState(null);
-    console.log(list);
     const elements = list?.map(el => <ListElement info={el} setIsVisible={setIsVisible} setValues={setValues} key={el.id}/>);
 
     const handleClick = () => {

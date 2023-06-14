@@ -9,7 +9,9 @@ function App() {
     useEffect(() => {
         const getAsyncList = async () => {
             const response = await getList();
-            setList(response);
+            if (!response.message) {
+                setList(response);
+            }
         };
         getAsyncList();
     }, []);

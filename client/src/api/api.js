@@ -5,7 +5,7 @@ export const getList = async () => {
         const response = await axios.get("http://localhost:5000/");
         return response.data;
     } catch (e) {
-        return e;
+        return { message: "Server error" };
     }
 };
 
@@ -14,7 +14,7 @@ export const addToList = async data => {
         const response = await axios.post("http://localhost:5000/", data);
         return response.data;
     } catch (e) {
-        return e;
+        return { message: "Server error" };
     }
 };
 
@@ -22,6 +22,6 @@ export const updateList = async (data) => {
     try {
         await axios.put("http://localhost:5000/", data);
     } catch (e) {
-        return e;
+        return { message: "Server error" };
     }
 };
