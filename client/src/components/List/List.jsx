@@ -7,10 +7,11 @@ import { ListContext } from "../../App";
 const List = () => {
     const { list, setList } = useContext(ListContext);
     const [isVisible, setIsVisible] = useState(false);
-    const elements = list.map(el => <ListElement info={el} setIsVisible={setIsVisible} key={el.id}/>);
+    const [values, setValues] = useState(null);
+    const elements = list.map(el => <ListElement info={el} setIsVisible={setIsVisible} setValues={setValues} key={el.id}/>);
     return (
         <>
-            <Popup isVisible={isVisible} setIsVisible={setIsVisible}/>
+            <Popup initValues={values} isVisible={isVisible} setIsVisible={setIsVisible}/>
             <div className={s.wrapper}>
                 <h1>list of players</h1>
                 <table className={s.table}>

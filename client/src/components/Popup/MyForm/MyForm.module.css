@@ -1,3 +1,14 @@
+.button {
+    font-weight: 600;
+    font-size: 18px;
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
 .form {
     height: 100%;
     display: flex;

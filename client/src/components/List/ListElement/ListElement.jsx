@@ -3,10 +3,16 @@ import PropTypes from "prop-types";
 import s from "./ListElement.module.css";
 import SocialElement from "./SocialElement/SocialElement";
 
-const ListElement = ({ info, setIsVisible }) => {
+const ListElement = ({ info, setIsVisible, setValues }) => {
     const socials = info.social.map(el => (
         <SocialElement info={el} key={el.id} />
     ));
+
+    const handleClick = () => {
+        setValues(info);
+        setIsVisible(true);
+    }
+
     return (
         <tr>
             <td>{info.name}</td>
@@ -19,7 +25,7 @@ const ListElement = ({ info, setIsVisible }) => {
             <td>{info.isProfessional ? info.professional.earnings : 0}$</td>
             <td>{socials}</td>
             <td>
-                <button className={s.button} onClick={() => setIsVisible(true)}>
+                <button className={s.button} onClick={handleClick}>
                     Edit
                 </button>
             </td>
@@ -30,6 +36,7 @@ const ListElement = ({ info, setIsVisible }) => {
 ListElement.propTypes = {
     info: PropTypes.object,
     setIsVisible: PropTypes.func,
+    setValues: PropTypes.func,
 };
 
 export default ListElement;
