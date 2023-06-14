@@ -11,7 +11,11 @@ const schema = yup.object().shape({
     username: yup.string().required().max(8),
     country: yup.string().required().max(20),
     age: yup.number().required().max(100),
-    game: yup.string().required()
+    social: yup.array().of(
+        yup.object().shape({
+            platform: yup.string().required(),
+        })
+    ),
 });
 
 const MyForm = ({ initValues, setIsVisible }) => {
@@ -82,7 +86,6 @@ const MyForm = ({ initValues, setIsVisible }) => {
             />
             <br />
 
-            {errors.game && <p style={{color: "red"}}>{errors.game.message}</p>}
             <label>Game:</label>
             <select {...register("game")}>
                 <option value="CS:GO">CS:GO</option>
@@ -130,11 +133,13 @@ const MyForm = ({ initValues, setIsVisible }) => {
             {watch("isProfessional") === "true" && (
                 <>
                     <label>Team:</label>
-                    <input
-                        type="text"
-                        placeholder="Enter team..."
-                        {...register("professional.team")}
-                    />
+                    <select {...register("professional.team")}>
+                        <option value="NaVi">NaVi</option>
+                        <option value="G2">G2</option>
+                        <option value="Fnatic">Fnatic</option>
+                        <option value="Team Spirit">Team Spirit</option>
+                        <option value="Liquid">Liquid</option>
+                    </select>
                     <br />
 
                     <label>Earnings:</label>
@@ -149,12 +154,16 @@ const MyForm = ({ initValues, setIsVisible }) => {
 
             {fields.map((field, index) => (
                 <div key={field.id}>
+                    {errors.social && errors.social[index] && (
+                        <p style={{color: "red"}}>{errors.social[index].platform?.message}</p>
+                    )}
                     <label>Social Platform:</label>
-                    <input
-                        type="text"
-                        placeholder="Enter platform..."
-                        {...register(`social[${index}].platform`)}
-                    />
+                    <select {...register(`social[${index}].platform`)}>
+                        <option value="twitch">twitch</option>
+                        <option value="youtube">youtube</option>
+                        <option value="vk">vk</option>
+                        <option value="tiktok">tiktok</option>
+                    </select>
                     <br />
 
                     <label>Social URL:</label>
