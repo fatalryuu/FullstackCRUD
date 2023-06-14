@@ -1,13 +1,32 @@
 import React, { useContext } from "react";
 import s from "./MyForm.module.css";
 import { useForm, useFieldArray } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import PropTypes from "prop-types";
 import { ListContext } from "../../../App";
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+    name: yup.string().required().max(20),
+    username: yup.string().required().max(8),
+    country: yup.string().required().max(20),
+    age: yup.number().required().max(100),
+    game: yup.string().required()
+});
 
 const MyForm = ({ initValues, setIsVisible }) => {
     const { list, setList } = useContext(ListContext);
-    const { register, control, handleSubmit, watch, reset, setValue } =
-        useForm();
+    const {
+        register,
+        control,
+        handleSubmit,
+        watch,
+        reset,
+        setValue,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(schema),
+    });
     const { fields, append, remove } = useFieldArray({
         control,
         name: "social",
@@ -23,6 +42,7 @@ const MyForm = ({ initValues, setIsVisible }) => {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={s.form}>
+            {errors.name && <p style={{color: "red"}}>{errors.name.message}</p>}
             <label>Name:</label>
             <input
                 type="text"
@@ -32,6 +52,7 @@ const MyForm = ({ initValues, setIsVisible }) => {
             />
             <br />
 
+            {errors.username && <p style={{color: "red"}}>{errors.username.message}</p>}
             <label>Username:</label>
             <input
                 type="text"
@@ -41,6 +62,7 @@ const MyForm = ({ initValues, setIsVisible }) => {
             />
             <br />
 
+            {errors.country && <p style={{color: "red"}}>{errors.country.message}</p>}
             <label>Country:</label>
             <input
                 type="text"
@@ -50,6 +72,7 @@ const MyForm = ({ initValues, setIsVisible }) => {
             />
             <br />
 
+            {errors.age && <p style={{color: "red"}}>{errors.age.message}</p>}
             <label>Age:</label>
             <input
                 type="number"
@@ -59,6 +82,7 @@ const MyForm = ({ initValues, setIsVisible }) => {
             />
             <br />
 
+            {errors.game && <p style={{color: "red"}}>{errors.game.message}</p>}
             <label>Game:</label>
             <select {...register("game")}>
                 <option value="CS:GO">CS:GO</option>
