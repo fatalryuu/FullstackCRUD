@@ -1,0 +1,5 @@
+# Ignore artifacts:
+.idea
+.idea/workspace.xml
+/node_modules
+build
