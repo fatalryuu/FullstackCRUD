@@ -9,6 +9,12 @@ const List = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [values, setValues] = useState(null);
     const elements = list.map(el => <ListElement info={el} setIsVisible={setIsVisible} setValues={setValues} key={el.id}/>);
+
+    const handleClick = () => {
+        setValues(null);
+        setIsVisible(true);
+    }
+
     return (
         <>
             <Popup initValues={values} isVisible={isVisible} setIsVisible={setIsVisible}/>
@@ -31,7 +37,7 @@ const List = () => {
                     </thead>
                     <tbody>{elements}</tbody>
                 </table>
-                <button className={s.button} onClick={() => setIsVisible(true)}>
+                <button className={s.button} onClick={handleClick}>
                     Create
                 </button>
             </div>

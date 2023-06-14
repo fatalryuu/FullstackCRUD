@@ -36,6 +36,27 @@ const MyForm = ({ initValues, setIsVisible }) => {
         name: "social",
     });
 
+    useEffect(() => {
+        if (initValues) {
+            setValue("name", initValues.name);
+            setValue("username", initValues.username);
+            setValue("country", initValues.country);
+            setValue("age", initValues.age);
+            setValue("game", initValues.game);
+            setValue("level", initValues.level);
+            setValue("isProfessional", initValues.isProfessional.toString());
+            if (initValues.isProfessional) {
+                setValue("professional.team", initValues.professional.team);
+                setValue("professional.earnings", initValues.professional.earnings);
+            }
+            initValues.social.map((el, index) => {
+                append({ id: fields.length + 1, platform: "", url: "" });
+                setValue(`social[${index}].platform`, initValues?.social[index]?.platform);
+                setValue(`social[${index}].url`, initValues?.social[index]?.url);
+            })
+        }
+    }, [initValues]);
+
     const onClose = () => {
         reset();
         fields.map((field, index) => remove(index));
@@ -43,8 +64,18 @@ const MyForm = ({ initValues, setIsVisible }) => {
     }
 
     const onSubmit = data => {
-        data.id = list.length + 1;
-        setList(prev => [...prev, data]);
+        if (data.isProfessional === "false") {
+            data.isProfessional = false;
+        } else if (data.isProfessional === "true") {
+            data.isProfessional = true
+        }
+
+        if (initValues) {
+            // updateList();
+        } else {
+            // data.id = addToList();
+            setList(prev => [...prev, data]);
+        }
         reset();
         fields.map((field, index) => remove(index));
         setIsVisible(false);
@@ -62,7 +93,6 @@ const MyForm = ({ initValues, setIsVisible }) => {
                 <label>Name:</label>
                 <input
                     type="text"
-                    defaultValue={initValues?.name}
                     placeholder="Enter name..."
                     autoComplete="off"
                     {...register("name")}
@@ -136,13 +166,14 @@ const MyForm = ({ initValues, setIsVisible }) => {
                     <input
                         type="radio"
                         value="true"
+                        defaultChecked={initValues?.isProfessional}
                         {...register("isProfessional")}
                     />{" "}
                     Yes{" "}
                     <input
                         type="radio"
                         value="false"
-                        defaultChecked={true}
+                        defaultChecked={!initValues?.isProfessional}
                         {...register("isProfessional")}
                     />{" "}
                     No
@@ -163,7 +194,8 @@ const MyForm = ({ initValues, setIsVisible }) => {
 
                         <label>Earnings:</label>
                         <input
-                            type="text"
+                            type="number"
+                            autoComplete={"off"}
                             placeholder="Enter earnings..."
                             {...register("professional.earnings")}
                         />
@@ -171,7 +203,13 @@ const MyForm = ({ initValues, setIsVisible }) => {
                     </>
                 )}
 
-                {fields.map((field, index) => (
+                {fields.map((field, index) => {
+                    if (initValues) {
+                        if (index >= initValues.social.length) {
+                            return;
+                        }
+                    }
+                    return (
                     <div key={field.id}>
                         {errors.social && errors.social[index] && (
                             <p style={{ color: "red" }}>
@@ -204,7 +242,7 @@ const MyForm = ({ initValues, setIsVisible }) => {
                         </button>
                         <br />
                     </div>
-                ))}
+                )})}
 
                 <button
                     type="button"
