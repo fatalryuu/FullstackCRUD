@@ -1,14 +1,15 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import s from "./MyForm.module.css";
 import { useForm, useFieldArray } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import PropTypes from "prop-types";
 import { ListContext } from "../../../App";
 import * as yup from "yup";
+import { addToList, updateList } from "../../../api/api";
 
 const schema = yup.object().shape({
     name: yup.string().required().max(20),
-    username: yup.string().required().max(8),
+    username: yup.string().required().max(20),
     country: yup.string().required().max(20),
     age: yup.number().required().max(100),
     social: yup.array().of(
@@ -19,6 +20,7 @@ const schema = yup.object().shape({
 });
 
 const MyForm = ({ initValues, setIsVisible }) => {
+    const [isInit, setIsInit] = useState(true);
     const { list, setList } = useContext(ListContext);
     const {
         register,
@@ -49,11 +51,12 @@ const MyForm = ({ initValues, setIsVisible }) => {
                 setValue("professional.team", initValues.professional.team);
                 setValue("professional.earnings", initValues.professional.earnings);
             }
-            initValues.social.map((el, index) => {
+            initValues.social.forEach((el, index) => {
                 append({ id: fields.length + 1, platform: "", url: "" });
                 setValue(`social[${index}].platform`, initValues?.social[index]?.platform);
                 setValue(`social[${index}].url`, initValues?.social[index]?.url);
             })
+            setIsInit(false);
         }
     }, [initValues]);
 
@@ -71,9 +74,12 @@ const MyForm = ({ initValues, setIsVisible }) => {
         }
 
         if (initValues) {
-            // updateList();
+            data.id = initValues.id;
+            updateList(data);
+            setList(list.filter(el => el.id !== data.id));
+            setList(prev => [...prev, data]);
         } else {
-            // data.id = addToList();
+            data.id = addToList(data);
             setList(prev => [...prev, data]);
         }
         reset();
@@ -204,9 +210,9 @@ const MyForm = ({ initValues, setIsVisible }) => {
                 )}
 
                 {fields.map((field, index) => {
-                    if (initValues) {
+                    if (isInit && initValues) {
                         if (index >= initValues.social.length) {
-                            return;
+                            return null;
                         }
                     }
                     return (
@@ -228,6 +234,7 @@ const MyForm = ({ initValues, setIsVisible }) => {
                         <label>Social URL:</label>
                         <input
                             type="text"
+                            autoComplete="off"
                             placeholder="Enter url..."
                             {...register(`social[${index}].url`)}
                         />

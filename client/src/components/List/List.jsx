@@ -5,7 +5,7 @@ import Popup from "../Popup/Popup";
 import { ListContext } from "../../App";
 
 const List = () => {
-    const { list, setList } = useContext(ListContext);
+    const { list } = useContext(ListContext);
     const [isVisible, setIsVisible] = useState(false);
     const [values, setValues] = useState(null);
     const elements = list.map(el => <ListElement info={el} setIsVisible={setIsVisible} setValues={setValues} key={el.id}/>);
