@@ -76,8 +76,7 @@ const MyForm = ({ initValues, setIsVisible }) => {
         if (initValues) {
             data.id = initValues.id;
             updateList(data);
-            setList(list.filter(el => el.id !== data.id));
-            setList(prev => [...prev, data]);
+            setList([...list.filter(el => el.id !== data.id), data].sort((a, b) => a.id - b.id));
         } else {
             data.id = addToList(data);
             setList(prev => [...prev, data]);
