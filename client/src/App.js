@@ -10,7 +10,6 @@ function App() {
             setList(response);
         }
         getAsyncList();
-        console.log(list);
     }, []);
 
     return (

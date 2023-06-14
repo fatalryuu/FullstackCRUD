@@ -6,19 +6,18 @@ import SocialElement from "./SocialElement/SocialElement";
 const ListElement = ({info}) => {
     const socials = info.social.map(el => <SocialElement info={el} key={el.id}/>)
     return (
-        <div className={s.wrapper}>
-            <div>{info.name}</div>
-            <div>{info.username}</div>
-            <div>{info.country}</div>
-            <div>{info.age}</div>
-            <div>{info.game}</div>
-            <div>{info.level}</div>
-            {info.isProfessional && <div>
-                <div>{info.professional.team}</div>
-                <div>{info.professional.earnings}$</div>
-            </div>}
-            <div>{socials}</div>
-        </div>
+        <tr>
+            <td>{info.name}</td>
+            <td>{info.username}</td>
+            <td>{info.country}</td>
+            <td>{info.age}</td>
+            <td>{info.game}</td>
+            <td>{info.level}</td>
+            <td>{info.isProfessional ? info.professional.team : "No"}</td>
+            <td>{info.isProfessional ? info.professional.earnings : 0}$</td>
+            <td>{socials}</td>
+            <td><button className={s.button}>Edit</button></td>
+        </tr>
     );
 };
 

@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 const SocialElement = ({info}) => {
     return (
         <div className={s.element}>
-            {info.platform}:{info.url}
+            <a href={info.url}><b>{info.platform}</b></a>
         </div>
     );
 };
