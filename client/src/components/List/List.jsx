@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import s from "./List.module.css";
-import PropTypes from "prop-types";
 import ListElement from "./ListElement/ListElement";
 import Popup from "../Popup/Popup";
+import { ListContext } from "../../App";
 
-const List = ({ list }) => {
+const List = () => {
+    const { list, setList } = useContext(ListContext);
     const [isVisible, setIsVisible] = useState(false);
-    const elements = list.map(el => <ListElement info={el} key={el.id} />);
+    const elements = list.map(el => <ListElement info={el} setIsVisible={setIsVisible} key={el.id}/>);
     return (
         <>
             <Popup isVisible={isVisible} setIsVisible={setIsVisible}/>
@@ -35,10 +36,6 @@ const List = ({ list }) => {
             </div>
         </>
     );
-};
-
-List.propTypes = {
-    list: PropTypes.array,
 };
 
 export default List;

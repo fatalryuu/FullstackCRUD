@@ -1,6 +1,8 @@
 import List from "./components/List/List";
-import { useEffect, useState } from "react";
-import {getList} from "./api/api";
+import { useEffect, useState, createContext } from "react";
+import { getList } from "./api/api";
+
+export const ListContext = createContext();
 
 function App() {
     const [list, setList] = useState([]);
@@ -8,13 +10,15 @@ function App() {
         const getAsyncList = async () => {
             const response = await getList();
             setList(response);
-        }
+        };
         getAsyncList();
     }, []);
 
     return (
         <div className="app">
-            <List list={list}/>
+            <ListContext.Provider value={{ list, setList }}>
+                <List />
+            </ListContext.Provider>
         </div>
     );
 }

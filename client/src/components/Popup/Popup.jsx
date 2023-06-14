@@ -6,8 +6,15 @@ import MyForm from "./MyForm/MyForm";
 const Popup = ({ isVisible, setIsVisible }) => {
     return (
         <div className={isVisible ? s.visible : s.hidden}>
-            <button onClick={() => setIsVisible(false)}>X</button>
-            <MyForm />
+            <div className={s.wrapper}>
+                <button
+                    onClick={() => setIsVisible(false)}
+                    className={s.button}
+                >
+                    X
+                </button>
+                <MyForm initValues={null} setIsVisible={setIsVisible}/>
+            </div>
         </div>
     );
 };

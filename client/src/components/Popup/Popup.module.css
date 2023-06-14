@@ -1,5 +1,8 @@
 .visible {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     position: fixed;
     top: 0;
     left: 0;
@@ -10,4 +13,26 @@
 
 .hidden {
     display: none;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 800px;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 10px;
+    overflow-y: auto;
+}
+
+.button {
+    font-weight: 600;
+    font-size: 18px;
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
 }
