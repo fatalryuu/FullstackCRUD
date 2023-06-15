@@ -66,7 +66,7 @@ const MyForm = ({ initValues, setIsVisible }) => {
         setIsVisible(false);
     }
 
-    const onSubmit = data => {
+    const onSubmit = async data => {
         if (data.isProfessional === "false") {
             data.isProfessional = false;
         } else if (data.isProfessional === "true") {
@@ -75,11 +75,16 @@ const MyForm = ({ initValues, setIsVisible }) => {
 
         if (initValues) {
             data.id = initValues.id;
-            updateList(data);
-            setList([...list.filter(el => el.id !== data.id), data].sort((a, b) => a.id - b.id));
+            const response = await updateList(data);
+            if (!response?.message) {
+                setList([...list.filter(el => el.id !== data.id), data].sort((a, b) => a.id - b.id));
+            }
         } else {
-            data.id = addToList(data);
-            setList(prev => [...prev, data]);
+            const response = await addToList(data);
+            if (!response.message) {
+                data.id = response;
+                setList(prev => [...prev, data]);
+            }
         }
         reset();
         fields.map((field, index) => remove(index));
