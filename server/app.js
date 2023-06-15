@@ -135,14 +135,16 @@ app.put("/", async (req, res) => {
             ],
         );
         if (social) {
+            await db.query(
+                `DELETE FROM player_social WHERE player_id = $1`,
+                [id],
+            );
             social.forEach(async s => {
                 await db.query(
                     `
-                        UPDATE player_social
-                        SET platform = COALESCE($1, platform),
-                            url      = platform($2, url)
-                        WHERE player_id = $3`,
-                    [s.platform, s.url, id],
+                        INSERT INTO player_social (player_id, platform, url)
+                        VALUES ($1, $2, $3)`,
+                    [id, s.platform, s.url],
                 );
             });
         }
