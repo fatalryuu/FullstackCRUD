@@ -134,11 +134,14 @@ app.put("/", async (req, res) => {
                 id,
             ],
         );
+        //if socials were changed
         if (social) {
+            //delete all previous socials
             await db.query(
                 `DELETE FROM player_social WHERE player_id = $1`,
                 [id],
             );
+            //add socials from req
             social.forEach(async s => {
                 await db.query(
                     `

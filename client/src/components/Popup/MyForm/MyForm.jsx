@@ -1,12 +1,16 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 import s from "./MyForm.module.css";
-import { useForm, useFieldArray } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import {useForm, useFieldArray} from "react-hook-form";
+import {yupResolver} from "@hookform/resolvers/yup";
 import PropTypes from "prop-types";
-import { ListContext } from "../../../App";
+import {ListContext} from "../../../App";
 import * as yup from "yup";
-import { addToList, updateList } from "../../../api/api";
+import {addToList, updateList} from "../../../api/api";
+import Input from "./Inputs/Input";
+import Select from "./Inputs/Select";
+import Radio from "./Inputs/Radio";
 
+//validation
 const schema = yup.object().shape({
     name: yup.string().required().max(20),
     username: yup.string().required().max(20),
@@ -15,13 +19,14 @@ const schema = yup.object().shape({
     social: yup.array().of(
         yup.object().shape({
             platform: yup.string().required(),
+            url: yup.string().required(),
         }),
     ),
 });
 
-const MyForm = ({ initValues, setValues, setIsVisible }) => {
+const MyForm = ({initValues, setValues, setIsVisible}) => {
     const [isInit, setIsInit] = useState(true);
-    const { list, setList } = useContext(ListContext);
+    const {list, setList} = useContext(ListContext);
     const {
         register,
         control,
@@ -29,15 +34,16 @@ const MyForm = ({ initValues, setValues, setIsVisible }) => {
         watch,
         reset,
         setValue,
-        formState: { errors },
+        formState: {errors},
     } = useForm({
         resolver: yupResolver(schema),
     });
-    const { fields, append, remove } = useFieldArray({
+    const {fields, append, remove} = useFieldArray({
         control,
         name: "social",
     });
 
+    //edit mode
     useEffect(() => {
         if (initValues) {
             setValue("name", initValues.name);
@@ -62,6 +68,7 @@ const MyForm = ({ initValues, setValues, setIsVisible }) => {
         }
     }, [initValues]);
 
+    //close form action
     const onClose = () => {
         reset();
         fields.map((field, index) => remove(index));
@@ -69,13 +76,16 @@ const MyForm = ({ initValues, setValues, setIsVisible }) => {
         setIsVisible(false);
     }
 
+    //submit data
     const onSubmit = async data => {
+        //convert string from radio-button to boolean
         if (data.isProfessional === "false") {
             data.isProfessional = false;
         } else if (data.isProfessional === "true") {
             data.isProfessional = true
         }
 
+        //if edit mode
         if (initValues) {
             data.id = initValues.id;
             //find only changed fields
@@ -87,19 +97,21 @@ const MyForm = ({ initValues, setValues, setIsVisible }) => {
                     changed[key] = data[key];
                 }
             }
-            console.log(data);
-            console.log(changed);
             const response = await updateList(changed);
+            //if all is ok, delete previous version of player and add new, then sort by id
             if (!response?.message) {
                 setList([...list.filter(el => el.id !== data.id), data].sort((a, b) => a.id - b.id));
             }
         } else {
+            //creation mode
             const response = await addToList(data);
             if (!response.message) {
                 data.id = response;
                 setList(prev => [...prev, data]);
             }
         }
+
+        //reset form and close it
         reset();
         fields.map((field, index) => remove(index));
         setIsVisible(false);
@@ -111,174 +123,80 @@ const MyForm = ({ initValues, setValues, setIsVisible }) => {
                 X
             </button>
             <form onSubmit={handleSubmit(onSubmit)} className={s.form}>
-                {errors.name && (
-                    <p style={{ color: "red" }}>{errors.name.message}</p>
-                )}
-                <label>Name:</label>
-                <input
-                    type="text"
-                    placeholder="Enter name..."
-                    autoComplete="off"
-                    {...register("name")}
-                />
-                <br />
-
-                {errors.username && (
-                    <p style={{ color: "red" }}>{errors.username.message}</p>
-                )}
-                <label>Username:</label>
-                <input
-                    type="text"
-                    placeholder="Enter username..."
-                    autoComplete="off"
-                    {...register("username")}
-                />
-                <br />
-
-                {errors.country && (
-                    <p style={{ color: "red" }}>{errors.country.message}</p>
-                )}
-                <label>Country:</label>
-                <input
-                    type="text"
-                    placeholder="Enter country..."
-                    autoComplete="off"
-                    {...register("country")}
-                />
-                <br />
-
-                {errors.age && (
-                    <p style={{ color: "red" }}>{errors.age.message}</p>
-                )}
-                <label>Age:</label>
-                <input
-                    type="number"
-                    placeholder="Enter age..."
-                    autoComplete="off"
-                    {...register("age")}
-                />
-                <br />
-
-                <label>Game:</label>
-                <select {...register("game")}>
-                    <option value="CS:GO">CS:GO</option>
-                    <option value="Dota 2">Dota 2</option>
-                    <option value="Valorant">Valorant</option>
-                    <option value="PUBG">PUBG</option>
-                    <option value="Hearthstone">Hearthstone</option>
-                </select>
-                <br />
-
-                <label>Level:</label>
-                <select {...register("level")}>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                </select>
-                <br />
+                <Input label="Name:" type="text" placeholder="Enter name..." errors={errors} name="name"
+                       register={register}/>
+                <Input label="Username:" type="text" placeholder="Enter username..." errors={errors} name="username"
+                       register={register}/>
+                <Input label="Country:" type="text" placeholder="Enter country..." errors={errors} name="country"
+                       register={register}/>
+                <Input label="Age:" type="number" placeholder="Enter age..." errors={errors} name="age"
+                       register={register}/>
+                <Select label="Game:" options={["CS:GO", "Dota 2", "Valorant", "PUBG", "Hearthstone"]} name="game"
+                        register={register}/>
+                <Select label="Level:" options={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]} name="level"
+                        register={register}/>
 
                 <label>
                     Is Professional:
-                    <br />
-                    <input
-                        type="radio"
-                        value="true"
-                        defaultChecked={initValues?.isProfessional}
-                        {...register("isProfessional")}
-                    />{" "}
-                    Yes{" "}
-                    <input
-                        type="radio"
-                        value="false"
-                        defaultChecked={!initValues?.isProfessional}
-                        {...register("isProfessional")}
-                    />{" "}
-                    No
+                    <br/>
+                    <Radio value="true" defaultChecked={initValues?.isProfessional} text="Yes" name="isProfessional"
+                           register={register}/>
+                    <Radio value="false" defaultChecked={!initValues?.isProfessional} text="No" name="isProfessional"
+                           register={register}/>
                 </label>
-                <br />
+                <br/>
 
                 {watch("isProfessional") === "true" && (
                     <>
-                        <label>Team:</label>
-                        <select {...register("professional.team")}>
-                            <option value="NaVi">NaVi</option>
-                            <option value="G2">G2</option>
-                            <option value="Fnatic">Fnatic</option>
-                            <option value="Team Spirit">Team Spirit</option>
-                            <option value="Liquid">Liquid</option>
-                        </select>
-                        <br />
-
-                        <label>Earnings:</label>
-                        <input
-                            type="number"
-                            autoComplete={"off"}
-                            placeholder="Enter earnings..."
-                            {...register("professional.earnings")}
-                        />
-                        <br />
+                        <Select label="Team:" options={["NaVi", "G2", "Fnatic", "Team Spirit", "Liquid"]}
+                                name="professional.team" register={register}/>
+                        <Input label="Earnings:" type="number" placeholder="Enter earnings..." errors={errors}
+                               name="professional.earnings" register={register}/>
                     </>
                 )}
 
                 {fields.map((field, index) => {
+                    //if edit mode
                     if (isInit && initValues) {
+                        //if more than the length of array, then return
                         if (index >= initValues.social.length) {
                             return null;
                         }
                     }
                     return (
-                    <div key={field.id}>
-                        {errors.social && errors.social[index] && (
-                            <p style={{ color: "red" }}>
-                                {errors.social[index].platform?.message}
-                            </p>
-                        )}
-                        <label>Social Platform:</label>
-                        <select {...register(`social[${index}].platform`)}>
-                            <option value="twitch">twitch</option>
-                            <option value="youtube">youtube</option>
-                            <option value="vk">vk</option>
-                            <option value="tiktok">tiktok</option>
-                        </select>
-                        <br />
+                        <div key={field.id}>
+                            {errors.social && errors.social[index] && (
+                                <p style={{color: "red"}}>
+                                    {errors.social[index].platform?.message}
+                                </p>
+                            )}
+                            <Select label="Social Platform:" options={["twitch", "youtube", "vk", "tiktok"]}
+                                    name={`social[${index}].platform`} register={register}/>
+                            <Input label="Social URL:" type="text" placeholder="Enter url..." errors={errors}
+                                   name={`social[${index}].url`} register={register}/>
 
-                        <label>Social URL:</label>
-                        <input
-                            type="text"
-                            autoComplete="off"
-                            placeholder="Enter url..."
-                            {...register(`social[${index}].url`)}
-                        />
-                        <br />
-
-                        <button
-                            type="button"
-                            onClick={() => remove(index)}
-                            className={s.remove}
-                        >
-                            Remove Social
-                        </button>
-                        <br />
-                    </div>
-                )})}
+                            <button
+                                type="button"
+                                onClick={() => remove(index)}
+                                className={s.remove}
+                            >
+                                Remove Social
+                            </button>
+                            <br/>
+                        </div>
+                    )
+                })}
 
                 <button
                     type="button"
                     onClick={() =>
-                        append({ id: fields.length + 1, platform: "", url: "" })
+                        append({id: fields.length + 1, platform: "", url: ""})
                     }
                     className={s.add}
                 >
                     Add Social
                 </button>
-                <br />
+                <br/>
 
                 <button type="submit">Submit</button>
             </form>
