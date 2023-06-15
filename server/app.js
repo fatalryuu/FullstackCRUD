@@ -27,7 +27,16 @@ app.get("/", async (req, res) => {
 
     try {
         const selectQuery = await db.query(query);
-        res.json(selectQuery.rows);
+        //delete null social
+        const result = selectQuery.rows.map(r => {
+            if (r.social[0].id === null) {
+                let copy = Object.assign({}, r);
+                copy.social = [];
+                return copy;
+            }
+            return r;
+        })
+        res.json(result);
     } catch (err) {
         console.log(err);
         res.status(500).json({
@@ -66,7 +75,7 @@ app.post("/", async (req, res) => {
             ],
         );
         const id = playerQuery.rows[0].id;
-        if (social) {
+        if (social.length > 0) {
             social.forEach(async s => {
                 await db.query(
                     `
@@ -102,15 +111,15 @@ app.put("/", async (req, res) => {
         await db.query(
             `
                 UPDATE players
-                SET name            = $1,
-                    username        = $2,
-                    country         = $3,
-                    age             = $4,
-                    game            = $5,
-                    level           = $6,
-                    is_professional = $7,
-                    team            = $8,
-                    earnings        = $9
+                SET name            = COALESCE($1, name),
+                    username        = COALESCE($2, username),
+                    country         = COALESCE($3, country),
+                    age             = COALESCE($4, age),
+                    game            = COALESCE($5, game),
+                    level           = COALESCE($6, level),
+                    is_professional = COALESCE($7, is_professional),
+                    team            = COALESCE($8, team),
+                    earnings        = COALESCE($9, earnings)
                 WHERE id = $10`,
             [
                 name,
@@ -130,8 +139,8 @@ app.put("/", async (req, res) => {
                 await db.query(
                     `
                         UPDATE player_social
-                        SET platform = $1,
-                            url = $2
+                        SET platform = COALESCE($1, platform),
+                            url      = platform($2, url)
                         WHERE player_id = $3`,
                     [s.platform, s.url, id],
                 );

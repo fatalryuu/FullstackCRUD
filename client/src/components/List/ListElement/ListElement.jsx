@@ -4,7 +4,7 @@ import s from "./ListElement.module.css";
 import SocialElement from "./SocialElement/SocialElement";
 
 const ListElement = ({ info, setIsVisible, setValues }) => {
-    const socials = info.social.map(el => (
+    const socials = info.social?.map(el => (
         <SocialElement info={el} key={el.id} />
     ));
 

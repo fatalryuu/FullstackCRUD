@@ -17,7 +17,7 @@ const List = () => {
 
     return (
         <>
-            <Popup initValues={values} isVisible={isVisible} setIsVisible={setIsVisible}/>
+            <Popup initValues={values} setValues={setValues} isVisible={isVisible} setIsVisible={setIsVisible}/>
             <div className={s.wrapper}>
                 <h1>list of players</h1>
                 <table className={s.table}>

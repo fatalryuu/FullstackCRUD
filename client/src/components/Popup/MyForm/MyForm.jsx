@@ -19,7 +19,7 @@ const schema = yup.object().shape({
     ),
 });
 
-const MyForm = ({ initValues, setIsVisible }) => {
+const MyForm = ({ initValues, setValues, setIsVisible }) => {
     const [isInit, setIsInit] = useState(true);
     const { list, setList } = useContext(ListContext);
     const {
@@ -51,11 +51,13 @@ const MyForm = ({ initValues, setIsVisible }) => {
                 setValue("professional.team", initValues.professional.team);
                 setValue("professional.earnings", initValues.professional.earnings);
             }
-            initValues.social.forEach((el, index) => {
-                append({ id: fields.length + 1, platform: "", url: "" });
-                setValue(`social[${index}].platform`, initValues?.social[index]?.platform);
-                setValue(`social[${index}].url`, initValues?.social[index]?.url);
-            })
+            if (initValues.social.length > 0) {
+                initValues.social.forEach((el, index) => {
+                    append({id: fields.length + 1, platform: "", url: ""});
+                    setValue(`social[${index}].platform`, initValues?.social[index]?.platform);
+                    setValue(`social[${index}].url`, initValues?.social[index]?.url);
+                })
+            }
             setIsInit(false);
         }
     }, [initValues]);
@@ -63,6 +65,7 @@ const MyForm = ({ initValues, setIsVisible }) => {
     const onClose = () => {
         reset();
         fields.map((field, index) => remove(index));
+        setValues(null);
         setIsVisible(false);
     }
 
@@ -75,7 +78,18 @@ const MyForm = ({ initValues, setIsVisible }) => {
 
         if (initValues) {
             data.id = initValues.id;
-            const response = await updateList(data);
+            //find only changed fields
+            let changed = {
+                id: initValues.id,
+            };
+            for (let key in data) {
+                if (JSON.stringify(initValues[key]) !== JSON.stringify(data[key])) {
+                    changed[key] = data[key];
+                }
+            }
+            console.log(data);
+            console.log(changed);
+            const response = await updateList(changed);
             if (!response?.message) {
                 setList([...list.filter(el => el.id !== data.id), data].sort((a, b) => a.id - b.id));
             }
@@ -274,6 +288,7 @@ const MyForm = ({ initValues, setIsVisible }) => {
 
 MyForm.propTypes = {
     initValues: PropTypes.object,
+    setValues: PropTypes.func,
     setIsVisible: PropTypes.func,
 };
 
